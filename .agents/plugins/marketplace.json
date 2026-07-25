@@ -1,0 +1,20 @@
+{
+  "name": "openconnector",
+  "interface": {
+    "displayName": "Open Connector"
+  },
+  "plugins": [
+    {
+      "name": "openconnector",
+      "source": {
+        "source": "local",
+        "path": "./plugins/openconnector"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

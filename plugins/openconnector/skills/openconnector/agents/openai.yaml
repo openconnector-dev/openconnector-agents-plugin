@@ -1,0 +1,4 @@
+interface:
+  display_name: "Open Connector"
+  short_description: "Connect external services through the oc CLI."
+  default_prompt: "Use $openconnector to discover and run an Open Connector tool."
