@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "openconnector",
+  "version": "0.1.0",
+  "description": "Guide agents to use the Open Connector CLI for audited third-party tool calls.",
+  "author": {
+    "name": "Open Connector",
+    "url": "https://openconnector.dev"
+  },
+  "homepage": "https://docs.openconnector.dev/docs/getting-started/quickstart",
+  "license": "AGPL-3.0-only",
+  "keywords": [
+    "open-connector",
+    "integrations",
+    "connectors",
+    "Gmail",
+    "Github",
+    "Slack",
+    "Linear",
+    "oauth",
+    "tools"
+  ]
+}

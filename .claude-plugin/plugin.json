@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "openconnector",
+  "displayName": "Open Connector",
+  "version": "0.1.0",
+  "description": "Guide Claude Code to use the Open Connector CLI for audited third-party tool calls.",
+  "author": {
+    "name": "Open Connector",
+    "url": "https://openconnector.dev"
+  },
+  "homepage": "https://docs.openconnector.dev/docs/getting-started/quickstart",
+  "license": "AGPL-3.0-only",
+  "keywords": [
+    "open-connector",
+    "integrations",
+    "oauth",
+    "tools"
+  ],
+  "skills": "./skills/"
+}

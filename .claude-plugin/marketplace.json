@@ -1,0 +1,21 @@
+{
+  "name": "openconnector",
+  "owner": {
+    "name": "Open Connector",
+    "url": "https://openconnector.dev"
+  },
+  "description": "Open Connector skills for Claude Code.",
+  "plugins": [
+    {
+      "name": "openconnector",
+      "source": ".",
+      "description": "Use the Open Connector CLI for audited third-party tool calls.",
+      "category": "productivity",
+      "tags": [
+        "integrations",
+        "oauth",
+        "tools"
+      ]
+    }
+  ]
+}

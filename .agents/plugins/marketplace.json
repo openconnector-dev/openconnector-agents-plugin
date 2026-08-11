@@ -8,7 +8,7 @@
       "name": "openconnector",
       "source": {
         "source": "local",
-        "path": "./plugins/openconnector"
+        "path": "./"
       },
       "policy": {
         "installation": "AVAILABLE",
