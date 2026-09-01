@@ -98,8 +98,9 @@ servers, hooks, apps, or executable runtime are included.
 
 Ask the agent to use Open Connector for an external-service task. The Skill
 will first inspect whether `oc` is available, request confirmation before
-installing it when needed, and then guide discovery, account connection, and
-tool execution. It does not ask you to place credentials in the plugin files.
+installing it when needed, and then guide discovery, account connection, tool
+execution, and realtime Trigger workflows such as forwarding events to a local
+handler. It does not ask you to place credentials in the plugin files.
 
 ## Validation
 
