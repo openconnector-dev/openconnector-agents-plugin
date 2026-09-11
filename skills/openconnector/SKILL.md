@@ -19,7 +19,7 @@ Use `oc` through its retained Human OAuth login and selected Organization, Proje
 2. When exact tool slugs are known, inspect 1–20 of them with one `oc --json tools info <slug...>` call. Never serially invoke `tools info` for candidates that fit in one batch. Every response uses `{ tools, errors, summary }`; each `tools[slug]` is the complete Tool detail. Otherwise use `oc --json search <task>`; search is deterministic, not semantic.
 3. For a write tool, prepare input in a file and run `oc --json execute <slug> --dry-run --data @input.json`.
 4. Execute with `oc --json execute <slug> --data @input.json` only when the user authorized the action.
-5. If execution reports a missing connection, create or find an auth config, run `oc --json link <toolkit>`, and retry the original command.
+5. If execution reports a missing connection, create or find an auth config, then create a hosted link with `oc --json link <toolkit> --auth-config <id> --no-wait`. Give the returned `url` to the Human and ask them to open it and complete the connection. Check the returned `connectionId` with `oc --json connected-accounts info <id>`; retry the original command after its status is `active`.
 6. When the host needs the full Open Connector Agent Plugin, run `oc setup <agent> --no-input` only with the user's approval because it changes that agent's plugin configuration. Do not invoke interactive `oc setup` from an agent or script.
 7. When the user wants a personal MCP connection, preview `oc --json mcp setup <client> --dry-run`, then apply with `--yes` only after approval. This is separate from Agent Plugin setup.
 8. For realtime events, inspect `oc --json triggers list <toolkit>` and `oc --json triggers info <slug>` before creating an instance with an exact Connected Account and reviewed Trigger config.
@@ -44,13 +44,20 @@ oc --json search "create a github issue" --toolkit github
 oc --json tools info GITHUB_ISSUES_CREATE SLACK_CHAT_POST_MESSAGE
 oc --json toolkits info github
 oc --json auth-configs create github --auth-method github.oauth2
-oc --json --user-id user_123 link github --auth-config ac_...
+oc --json --user-id user_123 link github --auth-config ac_... --no-wait
 oc --json execute GITHUB_ISSUES_CREATE --connected-account conn_... \
   --dry-run --data @issue.json
 oc --json execute GITHUB_ISSUES_CREATE --connected-account conn_... --data @issue.json
 ```
 
-Batch `tools info` accepts 1–20 exact slugs; add `--allow-missing` only when missing slugs are expected and a successful exit is desired. Resolve any other per-tool errors before execution. Reuse a matching connection with `oc --json connected-accounts list`; otherwise inspect `oc --json auth-configs list --toolkit <toolkit>`, create/select an auth config, and link it with `oc --json link <toolkit> --auth-config <auth-config-id>`. Explain requested scopes or credential fields before the user-interactive link. `--data`, `--credentials`, and `--connection-config` accept inline JSON, `@file.json`, or `-` for stdin. Keep `--json` explicit in every agent or script command; do not rely on terminal detection or an implicit output mode.
+Batch `tools info` accepts 1–20 exact slugs; add `--allow-missing` only when missing slugs are expected and a successful exit is desired. Resolve any other per-tool errors before execution. Reuse a matching connection with `oc --json connected-accounts list`; otherwise:
+
+1. Inspect `oc --json auth-configs list --toolkit <toolkit>` and create or select one auth config.
+2. Run `oc --json link <toolkit> --auth-config <auth-config-id> --no-wait`.
+3. Explain the requested scopes or credential fields, then give the returned hosted `url` to the Human. The hosted page handles OAuth and collects API-key, Basic-auth, and provider-specific fields without placing secrets in Agent context.
+4. Check `oc --json connected-accounts info <connectionId>` until the connection is `active`, then continue the original task.
+
+Use direct `--credentials -` or a protected `@file` only when the Human explicitly requests a noninteractive connection and has chosen a secure local input channel. `--data`, `--credentials`, and `--connection-config` accept inline JSON, `@file.json`, or `-` for stdin. Keep `--json` explicit in every agent or script command; do not rely on terminal detection or an implicit output mode.
 
 ## Realtime Triggers
 
@@ -96,6 +103,7 @@ Use `--table` for compact tab-separated summaries (it cannot be combined with `-
 
 - Do not execute write tools, link accounts, create auth configs, proxy write methods, or delete connections unless the user requested that action.
 - Prefer one `tools info` batch (up to 20 slugs), then `execute --dry-run`, before a write. Batch info reports per-tool errors without discarding successful details; dry-run parses the request but does not claim server-side schema validation.
+- For an interactive connection, return the hosted link to the Human. Do not ask them to paste provider secrets into chat or create a temporary credential file.
 - Never put API keys, client secrets, or credential JSON directly in command arguments. Use stdin (`-`) or a protected file.
 - Preview deletion with `oc connected-accounts delete <id> --dry-run`; only use `--force` after explicit user authorization.
 - Pass `--json` to keep stdout and errors machine-readable. Read recovery commands from structured errors and retry the narrow original command.

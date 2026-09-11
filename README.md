@@ -2,7 +2,7 @@
 
 Installable agent plugins for Open Connector.
 
-The first release is an [Agent Plugins v1](https://agent-plugins.org/) skills-only package. Its single Skill guides an agent to install and use the first-party `oc` CLI; it does not bundle MCP servers, hooks, apps, or runtime code.
+The first release is an [Agent Plugins v1](https://agent-plugins.org/) skills-only package. Its single Skill guides an agent to install and use the first-party `oc` CLI, including handing a Human a hosted connection link so provider credentials stay out of prompts and terminal arguments. It does not bundle MCP servers, hooks, apps, or runtime code.
 
 ## Package design
 
