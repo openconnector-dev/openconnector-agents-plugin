@@ -1,6 +1,6 @@
 {
   "name": "openconnector",
-  "version": "0.1.0+codex.20260810085450",
+  "version": "0.2.0+codex.20261031042831",
   "description": "Guide Codex to use the Open Connector CLI for audited third-party tool calls.",
   "author": {
     "name": "Open Connector",

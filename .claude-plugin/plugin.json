@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "openconnector",
   "displayName": "Open Connector",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Guide Claude Code to use the Open Connector CLI for audited third-party tool calls.",
   "author": {
     "name": "Open Connector",
