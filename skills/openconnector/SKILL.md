@@ -15,7 +15,7 @@ Use `oc` through its selected Profile: a retained Human OAuth login, or a config
    curl -fsSL https://github.com/openconnector-dev/openconnector-community/releases/latest/download/install.sh | sh
    ```
 
-   Verify the installed version, then run `oc --json doctor`. Stop and follow its structured `next` instruction when `ok` is false.
+   The installer refuses a binary that does not match the release `SHA256SUMS`. Verify the installed version, then run `oc --json doctor`. Stop and follow its structured `next` instruction when `ok` is false.
 2. When exact tool slugs are known, inspect 1–20 of them with one `oc --json tools info <slug...>` call. Never serially invoke `tools info` for candidates that fit in one batch. Every response uses `{ tools, errors, summary }`; each `tools[slug]` is the complete Tool detail. Otherwise use `oc --json search <task>`; search is deterministic, not semantic.
 3. For a write tool, prepare input in a file and run `oc --json execute <slug> --dry-run --data @input.json`.
 4. Execute with `oc --json execute <slug> --data @input.json` only when the user authorized the action.
@@ -136,7 +136,7 @@ OC_TRIGGER_FORWARD_SECRET=whsec_... \
 
 ## Safety
 
-- Do not execute write tools, run `oc run` scripts, link or reconnect accounts, create auth configs, change Trigger Instances, proxy write methods, or delete connections unless the user requested that action.
+- Do not execute write tools, run `oc run` scripts, upgrade the CLI, link or reconnect accounts, create auth configs, change Trigger Instances, proxy write methods, or delete connections unless the user requested that action.
 - Prefer one `tools info` batch (up to 20 slugs), then `execute --dry-run`, before a write. Batch info reports per-tool errors without discarding successful details; dry-run parses the request but does not claim server-side schema validation.
 - Pass `--yes` only for the exact command the user authorized, after reviewing its `--dry-run` preview where one exists. Never add `--yes` to get past an approval error the user has not seen.
 - For an interactive connection, return the hosted link to the Human. Do not ask them to paste provider secrets into chat or create a temporary credential file.
@@ -162,7 +162,7 @@ OC_TRIGGER_FORWARD_SECRET=whsec_... \
 - `oc orgs` / `oc projects`: list, create, switch, and show the current Organization or Project; `oc projects user-id` sets the default connector userId. `orgs keys` and `projects keys` manage automation credentials, which print plaintext only once; use them only when the Human asks.
 - `oc mcp url|setup|authorizations`: print or install the fixed Human OAuth `/mcp` endpoint, then list or revoke per-client Project grants. Setup supports `codex`, `claude`, `cursor`, and `vscode`.
 - `oc setup` / `oc setup <agent...> --dry-run|--yes`: humans get detected-host selection; agents use explicit targets. Supported targets are `claude`, `codex`, `hermes`, `openclaw`, `vscode`, `cursor`, `grok-bot`, `kiro`, `github-copilot`, and `nanoclaw`; hosts without an install API return a successful `manual` result with steps. `--refresh` updates only hosts recorded by an earlier setup.
-- `oc upgrade --refresh-only`: refresh every Agent Plugin installation recorded in `~/.config/oc/installations.json` through each host's plugin manager; pass `--yes` outside a prompt. Binary self-upgrade is not currently available; reinstall with the official installer to change the CLI version. Skills from the Open Connector Skill Marketplace are updated separately with `npx skills update`.
+- `oc upgrade`: replace the CLI with the latest release binary (or `--to <version>`) after verifying it against the release `SHA256SUMS`, then refresh every Agent Plugin installation recorded in `~/.config/oc/installations.json` through each host's plugin manager. Preview with `oc --json upgrade --dry-run`, then apply with `oc --json upgrade --yes` only after approval. The implicit latest never downgrades, `--force` only reinstalls the running version, and an `oc` running from source refuses to replace itself. `--refresh-only --yes` refreshes Agent Plugins without changing the binary. Skills from the Open Connector Skill Marketplace are updated separately with `npx skills update`.
 
 MCP setup writes only the fixed server name `openconnector` and URL; it must never copy the CLI token, a Project key, context headers, or Connector `userId` into a client configuration. In non-interactive use, pass the client explicitly and use `--yes` only with authorization. Revoke an MCP context only when the user names or confirms the exact context.
 
