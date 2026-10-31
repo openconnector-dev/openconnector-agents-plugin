@@ -68,14 +68,23 @@ Use direct `--credentials -` or a protected `@file` only when the Human explicit
 
 ## Orchestrate with local JavaScript
 
-`oc run` executes a JavaScript async function body that can call several Tools and return one JSON result. It is not a sandbox: the script runs locally in a child process with the user's OS permissions. Write the script to a file, show it to the user, and pass `--yes` only after they authorize both the code and its Tool calls:
+`oc run` executes a JavaScript async function body that can call several Tools and return one JSON result. It is not a sandbox: the script runs locally in a child process with the user's OS permissions. Write the script to a file, show it to the user, preview it with `--dry-run`, and pass `--yes` only after they authorize both the code and its Tool calls:
 
 ```sh
+oc --json run --file ./workflow.js --dry-run --yes
 oc --json run --file ./workflow.js --yes
 oc --json run --file - --yes < ./workflow.js
 ```
 
-Inside the script, call `await execute(slug, data, { connectedAccount: "conn_..." })`; every call needs an exact Connected Account. Use `return` for the final JSON value; console output goes to stderr. Calls are not a transaction, and a failed call fails the run even when caught, so writes that already succeeded stay applied and are never retried automatically. `--timeout` bounds the whole run (default `5m`). Prefer individual `execute --dry-run` checks for each write before combining them in a script.
+The script gets three helpers, each behaving like its CLI command:
+
+- `await execute(slug, data, { connectedAccount: "conn_..." })` — like `oc execute`.
+- `await search(query, { toolkit, limit })` — like `oc search`; read-only.
+- `await proxy(url, { connectedAccount: "conn_...", method, headers, body })` — like `oc proxy`; `body` is a JSON object and Open Connector injects provider authorization.
+
+Every `execute()` and `proxy()` call needs an exact Connected Account. The value of a final expression, or an explicit `return`, is the JSON result; console output goes to stderr. Calls are not a transaction, and a failed call fails the run even when caught, so writes that already succeeded stay applied and are never retried automatically. `--timeout` bounds the whole run (default `5m`).
+
+`--dry-run` still runs the script locally, so it still needs `--yes`, but `execute()` and `proxy()` return previews (`dryRun: true`) instead of contacting providers. A script that reads fields from real Tool results may fail under `--dry-run`; review the previews it does return. Ctrl-C is forwarded to the script, which gets 2 seconds to clean up before SIGTERM and then SIGKILL; cleanup code cannot call helpers.
 
 ## Realtime Triggers
 
@@ -151,7 +160,7 @@ OC_TRIGGER_FORWARD_SECRET=whsec_... \
 - `oc search <query...>`: rank native catalog matches; `--toolkit` is a hard filter and `--limit` bounds results.
 - `oc toolkits list|info`: discover Toolkits, inspect metadata, and find auth methods. Use `list --query` to filter.
 - `oc tools list|info|execute`: filter tools with `list --query`; `info` inspects one Tool or batches up to 20 complete details in one request; then execute tools. `oc execute` is the top-level shortcut.
-- `oc run`: orchestrate several Tool calls with local JavaScript; requires `--yes` and runs with the user's OS permissions.
+- `oc run`: orchestrate Tool calls with local JavaScript through `execute()`, `search()` and `proxy()`; `--dry-run` previews provider calls; requires `--yes` and runs with the user's OS permissions.
 - `oc auth-configs create|list|info`: manage auth configurations.
 - `oc link` / `oc connected-accounts link|list|info|wait|reconnect|delete`: connect, wait for, reauthorize, and manage connections.
 - `oc triggers list|info|status|create|enable|disable|delete`: discover Trigger Types and manage realtime Trigger Instances. Writes support `--dry-run` and need `--yes` outside an interactive terminal.
